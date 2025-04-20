@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getDriverShift } from '../services/api';
-import { Alert, Box, Button, CircularProgress, Container, Paper, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Typography,
+} from '@mui/material';
+import VehicleCheck from '../components/VehicleCheck';
 
 type DriverInfo = {
   driverId: string;
@@ -48,11 +57,16 @@ function DriverInfo() {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Button variant="outlined"  onClick={() => navigate('/')}>Back</Button>
-      {!error && <Typography variant="h4" color='black' mt={2}>
-        Driver Info
-      </Typography>}
-
+      <Box p={2}>
+        <Button variant="outlined" onClick={() => navigate('/')}>
+          Back
+        </Button>
+      </Box>
+      {!error && (
+        <Typography variant="h4" color="black" mt={2}>
+          Driver Info
+        </Typography>
+      )}
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
@@ -78,11 +92,13 @@ function DriverInfo() {
           <Box>
             <Typography variant="h6">Vehicle Check:</Typography>
             <Typography color={driverInfo.vehicleCheckDone ? 'green' : 'red'}>
-              {driverInfo.vehicleCheckDone ? '✅ Done' : '❌ Pending'}
+              {driverInfo.vehicleCheckDone ? '✅ Done' : "❌ Haven't done"}
             </Typography>
           </Box>
         </Paper>
       )}
+
+      <VehicleCheck />
     </Container>
   );
 }

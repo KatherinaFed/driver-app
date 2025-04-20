@@ -5,7 +5,7 @@ import DriverInfo from './pages/DriverInfo';
 
 function App() {
   return (
-    <Container className="driver-app-container">
+    <Container sx={{bgcolor: '#cfe8fc'}}  className="driver-app-container">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
