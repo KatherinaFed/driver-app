@@ -6,8 +6,8 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
-import { postVehicleCheck } from '../services/api';
+import { useEffect, useState } from 'react';
+import { getAssignedRide, postVehicleCheck } from '../services/api';
 
 type VehicleCheckList = {
   carOk: boolean;
@@ -16,25 +16,31 @@ type VehicleCheckList = {
   brakesWorking: boolean;
 };
 
-function VehicleCheck() {
+interface VehicleProps {
+  onSuccess: () => void;
+}
+
+function VehicleCheck({ onSuccess }: VehicleProps) {
   const [checkList, setCheckList] = useState<VehicleCheckList>({
     carOk: false,
     licenseOk: false,
     lightsWorking: false,
     brakesWorking: false,
   });
-
   const [error, setError] = useState<string>('');
 
-  const allChecked = Object.values(checkList).every((item) => item === true);
+  // const allChecked = Object.values(checkList).every((item) => item === true);
 
+  // Check list
   const handleChangeItem = (key: keyof VehicleCheckList) => {
     setCheckList((prevKeys) => ({ ...prevKeys, [key]: !prevKeys[key] }));
   };
 
+  // POST vehicle checklist
   const handleSubmit = async () => {
     try {
       await postVehicleCheck(checkList);
+      onSuccess();
     } catch (err: any) {
       setError(
         err.response?.data?.message || 'Failed to submit vehicle checklist'
@@ -64,7 +70,7 @@ function VehicleCheck() {
       <Box p={2}>
         <Button
           variant="outlined"
-          disabled={!allChecked || false}
+          // disabled={!allChecked || false}
           onClick={handleSubmit}
         >
           Submit Checklist

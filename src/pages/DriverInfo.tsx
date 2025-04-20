@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getDriverShift } from '../services/api';
+import { getAssignedRide, getDriverShift } from '../services/api';
 import {
   Alert,
   Box,
@@ -20,40 +20,106 @@ type DriverInfo = {
   vehicleCheckDone: boolean;
 };
 
+type Passenger = {
+  id: string;
+  name: string;
+  status: string;
+};
+
+type Ride = {
+  dropoffLocation: {
+    address: string;
+  };
+  passengers: Passenger[];
+  pickupLocation: {
+    address: string;
+  };
+  rideId: string;
+  rideStarted: boolean;
+  shiftId: string;
+};
+
 function DriverInfo() {
   const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
+  const [rideInfo, setRideInfo] = useState<Ride | null>(null);
 
-  const { driverId } = useParams<{ driverId: string }>();
+  // url params
+  const params = useParams<{ driverId: string }>();
   const navigate = useNavigate();
 
+  // GET driver shift
+  const fetchDriverInfo = async () => {
+    try {
+      if (!params.driverId) return;
+
+      const res = await getDriverShift(params.driverId);
+      const { data } = res;
+
+      const selectedData: DriverInfo = {
+        driverId: data.driverId,
+        licensePlate: data.licensePlate,
+        vehicleId: data.vehicleId,
+        vehicleName: data.vehicleName,
+        vehicleCheckDone: data.vehicleCheckDone,
+      };
+
+      setDriverInfo(selectedData);
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // checking driver ID
   useEffect(() => {
-    if (!driverId) return;
+    if (params.driverId) {
+      fetchDriverInfo();
+    }
+  }, [params.driverId]);
 
-    const fetchDriverInfo = async () => {
+  // checking if vehicle check Done
+  useEffect(() => {
+    if (!driverInfo?.vehicleCheckDone) return;
+
+    const pollingRide = async () => {
       try {
-        const res = await getDriverShift(driverId);
-        const { data } = res;
+        const res = await getAssignedRide();
 
-        const selectedData: DriverInfo = {
-          driverId: data.driverId,
-          licensePlate: data.licensePlate,
-          vehicleId: data.vehicleId,
-          vehicleName: data.vehicleName,
-          vehicleCheckDone: data.vehicleCheckDone,
-        };
+        if (res.status === 200) {
+          const { data } = res;
+          const selectedRidedata: Ride = {
+            dropoffLocation: data.dropoffLocation,
+            passengers: data.passengers,
+            pickupLocation: data.pickupLocation,
+            rideId: data.rideId,
+            rideStarted: data.rideStarted,
+            shiftId: data.shiftId,
+          };
 
-        setDriverInfo(selectedData);
+          setRideInfo(selectedRidedata);
+        }
       } catch (error: any) {
-        setError(error.response?.data?.message || 'Error fetching data');
-      } finally {
-        setLoading(false);
+        if (error.response?.status === 404) {
+          const message = 'Driver not found';
+          setError(message);
+        } else {
+          setError('Something went wrong. Please try again.');
+        }
       }
     };
 
-    fetchDriverInfo();
-  }, [driverId]);
+    const interval = setInterval(() => {
+      console.log('⏱ Polling /ride-request...');
+      pollingRide();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [driverInfo?.vehicleCheckDone]);
+
+  console.log(rideInfo);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
@@ -98,7 +164,9 @@ function DriverInfo() {
         </Paper>
       )}
 
-      <VehicleCheck />
+      {driverInfo && !driverInfo?.vehicleCheckDone && (
+        <VehicleCheck onSuccess={() => fetchDriverInfo()} />
+      )}
     </Container>
   );
 }
