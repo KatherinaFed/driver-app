@@ -82,7 +82,12 @@ function DriverInfo() {
 
   // checking if vehicle check Done
   useEffect(() => {
-    if (!driverInfo?.vehicleCheckDone) return;
+    // skip if vehicle check is true or the polling after ride data is recieved
+    if (!driverInfo?.vehicleCheckDone || rideInfo) return;
+
+    // 5–20 seconds
+    const maxPollingTime = 20000;
+    const pollingStartTime = Date.now();
 
     const pollingRide = async () => {
       try {
@@ -90,7 +95,7 @@ function DriverInfo() {
 
         if (res.status === 200) {
           const { data } = res;
-          const selectedRidedata: Ride = {
+          const selectedRideData: Ride = {
             dropoffLocation: data.dropoffLocation,
             passengers: data.passengers,
             pickupLocation: data.pickupLocation,
@@ -99,27 +104,34 @@ function DriverInfo() {
             shiftId: data.shiftId,
           };
 
-          setRideInfo(selectedRidedata);
+          setRideInfo(selectedRideData);
+          setError('');
+          clearInterval(interval);
         }
       } catch (error: any) {
-        if (error.response?.status === 404) {
-          const message = 'Driver not found';
-          setError(message);
+        if (error.response?.status !== 404) {
+          setError('Failed to check ride assignment');
         } else {
-          setError('Something went wrong. Please try again.');
+          setError('No ride assigned yet');
         }
       }
     };
 
     const interval = setInterval(() => {
-      console.log('⏱ Polling /ride-request...');
-      pollingRide();
+      const timeOut = Date.now() - pollingStartTime;
+
+      if (timeOut > maxPollingTime) {
+        clearInterval(interval);
+        setError('No rides, please, try again');
+      } else {
+        pollingRide();
+      }
     }, 3000);
 
-    return () => clearInterval(interval);
-  }, [driverInfo?.vehicleCheckDone]);
-
-  console.log(rideInfo);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [driverInfo?.vehicleCheckDone, rideInfo]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
@@ -135,7 +147,6 @@ function DriverInfo() {
       )}
 
       {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
 
       {driverInfo && (
         <Paper sx={{ p: 3, mt: 3 }}>
@@ -163,6 +174,8 @@ function DriverInfo() {
           </Box>
         </Paper>
       )}
+
+      {error && <Alert severity="error">{error}</Alert>}
 
       {driverInfo && !driverInfo?.vehicleCheckDone && (
         <VehicleCheck onSuccess={() => fetchDriverInfo()} />

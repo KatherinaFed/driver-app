@@ -6,8 +6,8 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { getAssignedRide, postVehicleCheck } from '../services/api';
+import { useState } from 'react';
+import { postVehicleCheck } from '../services/api';
 
 type VehicleCheckList = {
   carOk: boolean;
@@ -29,7 +29,7 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
   });
   const [error, setError] = useState<string>('');
 
-  // const allChecked = Object.values(checkList).every((item) => item === true);
+  const allChecked = Object.values(checkList).every((item) => item === true);
 
   // Check list
   const handleChangeItem = (key: keyof VehicleCheckList) => {
@@ -70,11 +70,16 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
       <Box p={2}>
         <Button
           variant="outlined"
-          // disabled={!allChecked || false}
+          disabled={!allChecked}
           onClick={handleSubmit}
         >
           Submit Checklist
         </Button>
+        {!allChecked && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            Please, check all items to continue
+          </Typography>
+        )}
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}

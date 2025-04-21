@@ -14,3 +14,7 @@ export const postVehicleCheck = (checkList: object) => {
 export const getAssignedRide = () => {
   return axios.get(`${BASE_URL}/ride-request`);
 };
+
+export const postCheckInPassengers = (passengerId: string, status: string) => {
+  return axios.post(`${BASE_URL}/check-in-passenger`, { passengerId, status });
+};
