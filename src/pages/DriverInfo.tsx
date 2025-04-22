@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import VehicleCheck from '../components/VehicleCheck';
+import { Ride } from '../shared/types';
 
 type DriverInfo = {
   driverId: string;
@@ -18,25 +19,6 @@ type DriverInfo = {
   vehicleId: string;
   vehicleName: string;
   vehicleCheckDone: boolean;
-};
-
-type Passenger = {
-  id: string;
-  name: string;
-  status: string;
-};
-
-type Ride = {
-  dropoffLocation: {
-    address: string;
-  };
-  passengers: Passenger[];
-  pickupLocation: {
-    address: string;
-  };
-  rideId: string;
-  rideStarted: boolean;
-  shiftId: string;
 };
 
 function DriverInfo() {
@@ -106,6 +88,7 @@ function DriverInfo() {
 
           setRideInfo(selectedRideData);
           setError('');
+          navigate('/ride', { state: selectedRideData });
           clearInterval(interval);
         }
       } catch (error: any) {

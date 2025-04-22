@@ -7,7 +7,6 @@ export const getDriverShift = (driverId: string) => {
 };
 
 export const postVehicleCheck = (checkList: object) => {
-  console.log(checkList);
   return axios.post(`${BASE_URL}/vehicle-check`, checkList);
 };
 
@@ -15,6 +14,14 @@ export const getAssignedRide = () => {
   return axios.get(`${BASE_URL}/ride-request`);
 };
 
-export const postCheckInPassengers = (passengerId: string, status: string) => {
-  return axios.post(`${BASE_URL}/check-in-passenger`, { passengerId, status });
+export const postCheckInPassengers = (
+  shiftId: string,
+  passengerId: string,
+  action: string
+) => {
+  return axios.post(`${BASE_URL}/check-in-passenger`, {
+    shiftId,
+    passengerId,
+    action,
+  });
 };

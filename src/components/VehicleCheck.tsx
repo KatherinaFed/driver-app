@@ -29,7 +29,16 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
   });
   const [error, setError] = useState<string>('');
 
-  const allChecked = Object.values(checkList).every((item) => item === true);
+  const allChecked = Object.values(checkList).every(
+    (item: boolean) => item === true
+  );
+
+  const labelNames = {
+    carOk: 'Vehicle is OK',
+    licenseOk: 'Driver license is valid',
+    lightsWorking: 'All lights are working',
+    brakesWorking: 'Brakes are working',
+  };
 
   // Check list
   const handleChangeItem = (key: keyof VehicleCheckList) => {
@@ -41,6 +50,7 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
     try {
       await postVehicleCheck(checkList);
       onSuccess();
+      setError('');
     } catch (err: any) {
       setError(
         err.response?.data?.message || 'Failed to submit vehicle checklist'
@@ -57,7 +67,7 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
       {Object.entries(checkList).map(([key, value]) => (
         <FormControlLabel
           key={key}
-          label={`${key}`}
+          label={labelNames[key as keyof VehicleCheckList]}
           control={
             <Checkbox
               checked={value}
