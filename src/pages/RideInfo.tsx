@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Passenger, Ride } from '../shared/types';
 import {
@@ -6,13 +6,13 @@ import {
   Box,
   Button,
   Chip,
-  Container,
   Divider,
   Paper,
-  Stack,
   Typography,
 } from '@mui/material';
 import { postCheckInPassengers, postStartRide } from '../services/api';
+import checkIcon from '../assets/checkIcon.png';
+import rejectIson from '../assets/rejectIcon.png';
 
 const statusColorMap: Record<
   Passenger['status'],
@@ -32,6 +32,15 @@ const statusLabelMap: Record<
   pending: 'Waiting',
 };
 
+const statusColorLeftBorder: Record<
+  Passenger['status'],
+  '#2ecc71' | '#e74c3c' | '#bdc3c7'
+> = {
+  'checked-in': '#2ecc71',
+  rejected: '#e74c3c',
+  pending: '#bdc3c7',
+};
+
 function RideInfo() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,7 +50,7 @@ function RideInfo() {
   const [error, setError] = useState<string>('');
 
   const countOfPassengers = rideInfo.passengers.filter(
-    (pas) => pas.status === 'pending'
+    (pas) => pas.status !== 'pending'
   ).length;
 
   const handlePassengerCheck = async (passId: string, status: string) => {
@@ -78,18 +87,33 @@ function RideInfo() {
     }
   };
 
+  useEffect(() => {
+    const allHandled = rideInfo.passengers.every((p) => p.status !== 'pending');
+
+    if (allHandled) {
+      setError('');
+    }
+  }, [rideInfo.passengers, error]);
+
   return (
-    <Container maxWidth="md">
-      <Typography variant="h5" align="center"  p={2}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      height="100vh"
+      sx={{ marginTop: 1, paddingTop: 1 }}
+    >
+      <Typography variant="h5" align="center" p={2}>
         🚌 Ride Information
       </Typography>
 
       <Paper
         elevation={3}
         sx={{
-          p: 4,
+          width: '100%',
+          maxWidth: { xs: '80%', md: '500px' },
+          p: { xs: 2, md: 3 },
           borderRadius: 3,
-          mb: 4,
           backgroundColor: '#fdfdf3',
         }}
       >
@@ -109,46 +133,46 @@ function RideInfo() {
 
       <Divider variant="middle" />
 
-      <Typography variant="h5" align="center"  m={2}>
+      <Typography variant="h5" align="center" m={2}>
         Passengers ({countOfPassengers}/{rideInfo.passengers.length})
       </Typography>
 
       {rideInfo.passengers.map((pas, key) => (
         <Paper
           key={key}
+          elevation={2}
           sx={{
-            p: 2,
-            m: 2,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderRadius: 2,
-            bgcolor: '#fafafa',
+            width: '100%',
+            maxWidth: { xs: '80%', md: '500px' },
+            mb: 2,
+            p: { xs: 2, md: 3 },
+            borderRadius: 3,
+            borderLeft: `6px solid ${statusColorLeftBorder[pas.status]}`,
+
+            bgcolor: '#fdfdf3',
           }}
         >
-          <Box>
-            <Typography>
-              <Box component="span" fontWeight="bold">
-                👤 Name:
-              </Box>{' '}
-              {pas.name}
-            </Typography>
+          <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+            <Typography fontWeight={500}>👤 {pas.name}</Typography>
             <Chip
               label={statusLabelMap[pas.status]}
               color={statusColorMap[pas.status]}
               size="small"
-              sx={{ mt: 1 }}
+              variant="outlined"
             />
           </Box>
 
-          <Stack direction="row" spacing={1}>
+          <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
             <Button
               size="small"
-              variant="contained"
+              variant="outlined"
               color="success"
               onClick={() => handlePassengerCheck(pas.id, 'checked-in')}
             >
-              Check-In ✅
+              <img src={checkIcon} />
             </Button>
             <Button
               size="small"
@@ -156,29 +180,33 @@ function RideInfo() {
               color="error"
               onClick={() => handlePassengerCheck(pas.id, 'reject')}
             >
-              Reject ❌
+              <img src={rejectIson} />
             </Button>
-          </Stack>
+          </Box>
         </Paper>
       ))}
 
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
-      <Box display="flex" justifyContent="center" mt={3} pb={3}>
+      <Box>
         <Button
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
           variant="contained"
           color="success"
           size="large"
           onClick={handleStart}
         >
-          🚀 Start Ride
+          Start Ride
         </Button>
       </Box>
-    </Container>
+    </Box>
   );
 }
 

@@ -9,7 +9,7 @@ function StartRide() {
   return (
     <Box p={4} sx={{ position: 'relative' }} textAlign="center">
       <Button
-        sx={{ pt: '2', position: 'absolute', top: 10, right: 10 }}
+        sx={{ pt: '2', position: 'absolute', top: 10, left: 10 }}
         variant="outlined"
         onClick={() => navigate('/')}
       >
@@ -25,7 +25,7 @@ function StartRide() {
         <Lottie
           animationData={rideStartedAnimation}
           loop={true}
-          style={{ width: 300, height: 300 }}
+          style={{ width: 400, height: 400 }}
         />
       </Box>
 

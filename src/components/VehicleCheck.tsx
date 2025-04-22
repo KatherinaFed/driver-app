@@ -6,10 +6,9 @@ import {
   Divider,
   FormControlLabel,
   Paper,
-  Stack,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { postVehicleCheck } from '../services/api';
 
 type VehicleCheckList = {
@@ -57,60 +56,60 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
     }
   };
 
+
+
+  useEffect(() => {
+    if (Object.values(checkList).every((item) => item)) {
+      setError('');
+    }
+  }, [checkList]);
+
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
+    <Paper
+      elevation={3}
+      sx={{
+        width: '100%',
+        maxWidth: { xs: '80%', md: '500px' },
+        mt: 2,
+        p: { xs: 2, md: 3 },
+        borderRadius: 3,
+      }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          mt: 2,
-          p: 4,
-          borderRadius: 3,
-          backgroundColor: '#fdfdf3',
-        }}
-      >
-        <Typography variant="h6">✔️ Pre-trip Vehicle Checklist</Typography>
-        <Divider sx={{ mb: 2 }} />
+      <Typography variant="h6">✔️ Pre-trip Vehicle Checklist</Typography>
+      <Divider sx={{ mb: 2 }} />
 
-        <Stack>
-          {Object.entries(checkList).map(([key, value]) => (
-            <FormControlLabel
-              key={key}
-              label={labelNames[key as keyof VehicleCheckList]}
-              control={
-                <Checkbox
-                  checked={value}
-                  onChange={() =>
-                    handleChangeItem(key as keyof VehicleCheckList)
-                  }
-                />
-              }
-            />
-          ))}
-        </Stack>
+      <Box display="flex" flexDirection="column">
+        {Object.entries(checkList).map(([key, value]) => (
+          <FormControlLabel
+            key={key}
+            label={labelNames[key as keyof VehicleCheckList]}
+            control={
+              <Checkbox
+                checked={value}
+                onChange={() => handleChangeItem(key as keyof VehicleCheckList)}
+              />
+            }
+          />
+        ))}
+      </Box>
 
-        <Box mt={2}>
-          <Button
-            fullWidth
-            variant="contained"
-            color="success"
-            onClick={handleSubmit}
-          >
-            Submit Checklist
-          </Button>
-        </Box>
+      <Box mt={2}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="success"
+          onClick={handleSubmit}
+        >
+          Submit Checklist
+        </Button>
+      </Box>
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-      </Paper>
-    </Box>
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+    </Paper>
   );
 }
 

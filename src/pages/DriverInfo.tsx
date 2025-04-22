@@ -95,7 +95,8 @@ function DriverInfo() {
         if (error.response?.status !== 404) {
           setError('Failed to check ride assignment');
         } else {
-          setError('No ride assigned yet');
+          setLoading(true)
+          // setError('No ride assigned yet');
         }
       }
     };
@@ -109,10 +110,11 @@ function DriverInfo() {
       } else {
         pollingRide();
       }
-    }, 3000);
+    }, 1000);
 
     return () => {
       clearInterval(interval);
+      setLoading(false);
     };
   }, [driverInfo?.vehicleCheckDone, rideInfo]);
 
@@ -120,36 +122,48 @@ function DriverInfo() {
     <Box
       display="flex"
       flexDirection="column"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
       height="100vh"
+      sx={{ marginTop: 2, paddingTop: 2 }}
     >
       <Paper
         elevation={3}
         sx={{
-          p: 4,
+          width: '100%',
+          maxWidth: { xs: '80%', md: '500px' },
+          p: { xs: 2, md: 3 },
           borderRadius: 3,
-          bgcolor: '#fdfdf3',
+          backgroundColor: '#fdfdf3',
         }}
       >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mb: 2,
+            position: 'relative',
+          }}
         >
-          <Box>
-            <Typography variant="h5" color='#353b48'>🚐 Driver Info</Typography>
-          </Box>
-          <Box>
-            <Button
-              sx={{ ml: '2' }}
-              variant="outlined"
-              onClick={() => navigate('/')}
-            >
-              Back
-            </Button>
-          </Box>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/')}
+          >
+            Back
+          </Button>
+
+          <Typography
+            variant="h5"
+            color="#353b48"
+            sx={{
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 'max-content',
+            }}
+          >
+            🚐 Driver Info
+          </Typography>
         </Box>
 
         <Divider sx={{ mb: 2 }} />
