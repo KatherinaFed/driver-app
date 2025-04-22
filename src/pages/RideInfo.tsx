@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Passenger, Ride } from '../shared/types';
 import {
   Box,
@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { postCheckInPassengers } from '../services/api';
+import { postCheckInPassengers, postStartRide } from '../services/api';
 
 const statusColorMap: Record<
   Passenger['status'],
@@ -32,14 +32,12 @@ const statusLabelMap: Record<
 
 function RideInfo() {
   const location = useLocation();
+  const navigate = useNavigate();
   const data = location.state as Ride;
 
   const [rideInfo, setRideInfo] = useState<Ride>(data);
   const [error, setError] = useState<string>('');
 
-  const allChecked = rideInfo.passengers.every(
-    (pas) => pas.status === 'checked-in' || pas.status === 'rejected'
-  );
   const countOfPassengers = rideInfo.passengers.filter(
     (pas) => pas.status === 'pending'
   ).length;
@@ -63,6 +61,18 @@ function RideInfo() {
       }));
     } catch (err: any) {
       setError(err.response.data.message);
+    }
+  };
+
+  const handleStart = async () => {
+    try {
+      const res = await postStartRide();
+      if (res.status === 200) {
+        setError('');
+        navigate('/start-ride', { state: res.data.message });
+      }
+    } catch (err: any) {
+      setError(err.response.data.message || 'Something went wrong...');
     }
   };
 
@@ -101,7 +111,12 @@ function RideInfo() {
             color={pas.status === 'checked-in' ? 'success' : 'error'}
           >
             <Box>
-              <Typography>Passenger's name: {pas.name}</Typography>
+              <Typography>
+                <Box component="span" fontWeight="bold">
+                  Passenger's name:
+                </Box>{' '}
+                {pas.name}
+              </Typography>
               <Chip
                 label={statusLabelMap[pas.status]}
                 color={statusColorMap[pas.status]}
@@ -128,19 +143,21 @@ function RideInfo() {
         </Paper>
       ))}
 
-      {allChecked && (
-        <Box mt={4}>
-          <Button variant="contained" color="primary">
-            Start Ride ⚡️
-          </Button>
-        </Box>
-      )}
-
       {error && (
         <Typography color="error" mt={2} align="center">
           {error}
         </Typography>
       )}
+
+      <Box mt={4}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => handleStart()}
+        >
+          Start Ride
+        </Button>
+      </Box>
     </Box>
   );
 }

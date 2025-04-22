@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import { Container } from '@mui/material';
 import DriverInfo from './pages/DriverInfo';
 import RideInfo from './pages/RideInfo';
+import StartRide from './pages/StartRide';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="driver/:driverId" element={<DriverInfo />} />
           <Route path='/ride' element={<RideInfo/>} />
+          <Route path='/start-ride' element={<StartRide />} />
         </Routes>
       </BrowserRouter>
     </Container>

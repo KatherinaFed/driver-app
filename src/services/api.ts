@@ -25,3 +25,7 @@ export const postCheckInPassengers = (
     action,
   });
 };
+
+export const postStartRide = () => {
+  return axios.post(`${BASE_URL}/start-ride`, {});
+};
