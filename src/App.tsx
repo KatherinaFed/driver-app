@@ -7,13 +7,20 @@ import StartRide from './pages/StartRide';
 
 function App() {
   return (
-    <Container sx={{bgcolor: '#60bf78'}}  className="driver-app-container">
+    <Container
+      sx={{
+        background:
+          'linear-gradient(to bottom right, #f5fff9,#6ab04c)',
+        minHeight: '100vh',
+      }}
+      className="driver-app-container"
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="driver/:driverId" element={<DriverInfo />} />
-          <Route path='/ride' element={<RideInfo/>} />
-          <Route path='/start-ride' element={<StartRide />} />
+          <Route path="/ride" element={<RideInfo />} />
+          <Route path="/start-ride" element={<StartRide />} />
         </Routes>
       </BrowserRouter>
     </Container>

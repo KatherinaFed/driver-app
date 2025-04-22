@@ -3,7 +3,10 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   FormControlLabel,
+  Paper,
+  Stack,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
@@ -28,10 +31,6 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
     brakesWorking: false,
   });
   const [error, setError] = useState<string>('');
-
-  const allChecked = Object.values(checkList).every(
-    (item: boolean) => item === true
-  );
 
   const labelNames = {
     carOk: 'Vehicle is OK',
@@ -59,40 +58,58 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
   };
 
   return (
-    <Box m={2}>
-      <Typography variant="h6" color="black">
-        Pre-trip Vehicle Checklist
-      </Typography>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          mt: 2,
+          p: 4,
+          borderRadius: 3,
+          backgroundColor: '#fdfdf3',
+        }}
+      >
+        <Typography variant="h6">✔️ Pre-trip Vehicle Checklist</Typography>
+        <Divider sx={{ mb: 2 }} />
 
-      {Object.entries(checkList).map(([key, value]) => (
-        <FormControlLabel
-          key={key}
-          label={labelNames[key as keyof VehicleCheckList]}
-          control={
-            <Checkbox
-              checked={value}
-              onChange={() => handleChangeItem(key as keyof VehicleCheckList)}
+        <Stack>
+          {Object.entries(checkList).map(([key, value]) => (
+            <FormControlLabel
+              key={key}
+              label={labelNames[key as keyof VehicleCheckList]}
+              control={
+                <Checkbox
+                  checked={value}
+                  onChange={() =>
+                    handleChangeItem(key as keyof VehicleCheckList)
+                  }
+                />
+              }
             />
-          }
-        />
-      ))}
+          ))}
+        </Stack>
 
-      <Box p={2}>
-        <Button
-          variant="outlined"
-          disabled={!allChecked}
-          onClick={handleSubmit}
-        >
-          Submit Checklist
-        </Button>
-        {!allChecked && (
-          <Typography color="error" sx={{ mt: 2 }}>
-            Please, check all items to continue
-          </Typography>
+        <Box mt={2}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="success"
+            onClick={handleSubmit}
+          >
+            Submit Checklist
+          </Button>
+        </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
         )}
-      </Box>
-
-      {error && <Alert severity="error">{error}</Alert>}
+      </Paper>
     </Box>
   );
 }

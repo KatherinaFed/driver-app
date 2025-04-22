@@ -4,11 +4,17 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: white;
+  color: #353b48;
   background-color: #fdfcfc;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }

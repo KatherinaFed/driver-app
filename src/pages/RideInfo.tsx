@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Passenger, Ride } from '../shared/types';
 import {
+  Alert,
   Box,
   Button,
   Chip,
+  Container,
   Divider,
   Paper,
   Stack,
@@ -69,7 +71,7 @@ function RideInfo() {
       const res = await postStartRide();
       if (res.status === 200) {
         setError('');
-        navigate('/start-ride', { state: res.data.message });
+        navigate('/start-ride');
       }
     } catch (err: any) {
       setError(err.response.data.message || 'Something went wrong...');
@@ -77,88 +79,106 @@ function RideInfo() {
   };
 
   return (
-    <Box>
-      <Typography variant="h5" align="center" m={2} p={2}>
+    <Container maxWidth="md">
+      <Typography variant="h5" align="center"  p={2}>
         🚌 Ride Information
       </Typography>
 
-      <Paper elevation={4} sx={{ m: 2, p: 2 }}>
-        <Typography>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          mb: 4,
+          backgroundColor: '#fdfdf3',
+        }}
+      >
+        <Typography variant="body1" mb={1}>
           <Box component="span" fontWeight="bold">
             📍 From:
           </Box>{' '}
-          {data.pickupLocation.address}
+          {rideInfo.pickupLocation.address}
         </Typography>
-        <Typography>
+        <Typography variant="body1">
           <Box component="span" fontWeight="bold">
             🏁 To:
           </Box>{' '}
-          {data.dropoffLocation.address}
+          {rideInfo.dropoffLocation.address}
         </Typography>
       </Paper>
 
       <Divider variant="middle" />
 
-      <Typography variant="h5" align="center" m={2} p={2}>
-        👥 Passengers ({countOfPassengers}/{rideInfo.passengers.length})
+      <Typography variant="h5" align="center"  m={2}>
+        Passengers ({countOfPassengers}/{rideInfo.passengers.length})
       </Typography>
 
       {rideInfo.passengers.map((pas, key) => (
-        <Paper key={key} sx={{ m: 2, p: 2 }}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            color={pas.status === 'checked-in' ? 'success' : 'error'}
-          >
-            <Box>
-              <Typography>
-                <Box component="span" fontWeight="bold">
-                  Passenger's name:
-                </Box>{' '}
-                {pas.name}
-              </Typography>
-              <Chip
-                label={statusLabelMap[pas.status]}
-                color={statusColorMap[pas.status]}
-                size="small"
-              />
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => handlePassengerCheck(pas.id, 'checked-in')}
-              >
-                Check-In ✅
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => handlePassengerCheck(pas.id, 'reject')}
-              >
-                Reject ❌
-              </Button>
-            </Stack>
+        <Paper
+          key={key}
+          sx={{
+            p: 2,
+            m: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 2,
+            bgcolor: '#fafafa',
+          }}
+        >
+          <Box>
+            <Typography>
+              <Box component="span" fontWeight="bold">
+                👤 Name:
+              </Box>{' '}
+              {pas.name}
+            </Typography>
+            <Chip
+              label={statusLabelMap[pas.status]}
+              color={statusColorMap[pas.status]}
+              size="small"
+              sx={{ mt: 1 }}
+            />
+          </Box>
+
+          <Stack direction="row" spacing={1}>
+            <Button
+              size="small"
+              variant="contained"
+              color="success"
+              onClick={() => handlePassengerCheck(pas.id, 'checked-in')}
+            >
+              Check-In ✅
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={() => handlePassengerCheck(pas.id, 'reject')}
+            >
+              Reject ❌
+            </Button>
           </Stack>
         </Paper>
       ))}
 
       {error && (
-        <Typography color="error" mt={2} align="center">
+        <Alert severity="error" sx={{ mt: 2 }}>
           {error}
-        </Typography>
+        </Alert>
       )}
 
-      <Box mt={4}>
+      <Box display="flex" justifyContent="center" mt={3} pb={3}>
         <Button
           variant="contained"
-          color="secondary"
-          onClick={() => handleStart()}
+          color="success"
+          size="large"
+          onClick={handleStart}
         >
-          Start Ride
+          🚀 Start Ride
         </Button>
       </Box>
-    </Box>
+    </Container>
   );
 }
 

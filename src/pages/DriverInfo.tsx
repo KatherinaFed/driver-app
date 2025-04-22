@@ -6,7 +6,7 @@ import {
   Box,
   Button,
   CircularProgress,
-  Container,
+  Divider,
   Paper,
   Typography,
 } from '@mui/material';
@@ -117,53 +117,102 @@ function DriverInfo() {
   }, [driverInfo?.vehicleCheckDone, rideInfo]);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Box p={2}>
-        <Button variant="outlined" onClick={() => navigate('/')}>
-          Back
-        </Button>
-      </Box>
-      {!error && (
-        <Typography variant="h4" color="black" mt={2}>
-          Driver Info
-        </Typography>
-      )}
-
-      {loading && <CircularProgress />}
-
-      {driverInfo && (
-        <Paper sx={{ p: 3, mt: 3 }}>
-          <Box mb={2}>
-            <Typography variant="h6">Driver ID:</Typography>
-            <Typography>{driverInfo.driverId}</Typography>
-          </Box>
-          <Box mb={2}>
-            <Typography variant="h6">Auto:</Typography>
-            <Typography>{driverInfo.vehicleName}</Typography>
-          </Box>
-          <Box mb={2}>
-            <Typography variant="h6">Auto ID:</Typography>
-            <Typography>{driverInfo.vehicleId}</Typography>
-          </Box>
-          <Box mb={2}>
-            <Typography variant="h6">License Plate:</Typography>
-            <Typography>{driverInfo.licensePlate}</Typography>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          bgcolor: '#fdfdf3',
+        }}
+      >
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Box>
+            <Typography variant="h5" color='#353b48'>🚐 Driver Info</Typography>
           </Box>
           <Box>
-            <Typography variant="h6">Vehicle Check:</Typography>
-            <Typography color={driverInfo.vehicleCheckDone ? 'green' : 'red'}>
-              {driverInfo.vehicleCheckDone ? '✅ Done' : "❌ Haven't done"}
-            </Typography>
+            <Button
+              sx={{ ml: '2' }}
+              variant="outlined"
+              onClick={() => navigate('/')}
+            >
+              Back
+            </Button>
           </Box>
-        </Paper>
-      )}
+        </Box>
 
-      {error && <Alert severity="error">{error}</Alert>}
+        <Divider sx={{ mb: 2 }} />
+
+        {loading && (
+          <Box display="flex" justifyContent="center" my={4}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {driverInfo && (
+          <>
+            <Box mb={1}>
+              <Typography variant="body1">
+                <Box component="span" fontWeight="bold">
+                  Driver ID:
+                </Box>{' '}
+                {driverInfo.driverId}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography variant="body1">
+                <Box component="span" fontWeight="bold">
+                  Auto:
+                </Box>{' '}
+                {driverInfo.vehicleName}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography variant="body1">
+                <Box component="span" fontWeight="bold">
+                  License Plate:
+                </Box>{' '}
+                {driverInfo.licensePlate}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography variant="body1">
+                <Box component="span" fontWeight="bold">
+                  Vehicle Check:
+                </Box>{' '}
+                <Box
+                  component="span"
+                  color={driverInfo.vehicleCheckDone ? 'green' : 'red'}
+                >
+                  {driverInfo.vehicleCheckDone ? '✅ Done' : "❌ Haven't done"}
+                </Box>
+              </Typography>
+            </Box>
+          </>
+        )}
+      </Paper>
 
       {driverInfo && !driverInfo?.vehicleCheckDone && (
         <VehicleCheck onSuccess={() => fetchDriverInfo()} />
       )}
-    </Container>
+    </Box>
   );
 }
 
