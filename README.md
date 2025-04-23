@@ -32,7 +32,7 @@ cd driver-app
 ### 2. Install dependencies
 
 ```bash
-npm install express cors body-parser
+npm install
 ```
 
 ### 3. Run the server
