@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStartRide } from '../../hooks/useStartRide';
 import { DriverService } from '../../services/DriverService';
+import { AxiosResponse } from 'axios';
 
 vi.mock('../../services/DriverService');
 
@@ -16,7 +17,13 @@ describe('useStartRide', () => {
   });
 
   it('should navigate on successful ride start', async () => {
-    vi.mocked(DriverService.startRide).mockResolvedValue({ status: 200 });
+    vi.mocked(DriverService.startRide).mockResolvedValue({
+      status: 200,
+      data: { message: 'Ride started' },
+      statusText: 'OK',
+      headers: {},
+      config: {},
+    } as AxiosResponse);
 
     const { result } = renderHook(() => useStartRide());
 

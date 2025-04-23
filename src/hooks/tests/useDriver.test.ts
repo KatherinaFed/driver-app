@@ -3,9 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useDriver } from '../../hooks/useDriver';
 import { DriverService } from '../../services/DriverService';
 
-vi.mocked(
-  DriverService.getDriverShift as unknown as typeof DriverService.getDriverShift
-);
 vi.mock('../../services/DriverService');
 
 const mockDriverData = {
