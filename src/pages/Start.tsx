@@ -30,7 +30,7 @@ function StartRide() {
       </Box>
 
       <Typography variant="body1" color="textSecondary" mt={1}>
-        {'Your journey is started. Drive safe!'}
+        {'Your journey has started. Drive safe!'}
       </Typography>
     </Box>
   );

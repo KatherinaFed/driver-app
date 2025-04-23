@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import { Box } from '@mui/material';
-import DriverInfo from './pages/DriverInfo';
-import RideInfo from './pages/RideInfo';
-import StartRide from './pages/StartRide';
+import Driver from './pages/Driver';
+import Ride from './pages/Ride';
+import StartRide from './pages/Start';
 
 function App() {
   return (
@@ -19,8 +19,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="driver/:driverId" element={<DriverInfo />} />
-          <Route path="/ride" element={<RideInfo />} />
+          <Route path="driver/:driverId" element={<Driver />} />
+          <Route path="/ride" element={<Ride />} />
           <Route path="/start-ride" element={<StartRide />} />
         </Routes>
       </BrowserRouter>

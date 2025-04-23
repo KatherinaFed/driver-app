@@ -9,14 +9,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { postVehicleCheck } from '../services/api';
-
-type VehicleCheckList = {
-  carOk: boolean;
-  licenseOk: boolean;
-  lightsWorking: boolean;
-  brakesWorking: boolean;
-};
+import { VehicleCheckList } from '../shared/types';
+import { DriverService } from '../services/DriverService';
 
 interface VehicleProps {
   onSuccess: () => void;
@@ -46,7 +40,7 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
   // POST vehicle checklist
   const handleSubmit = async () => {
     try {
-      await postVehicleCheck(checkList);
+      await DriverService.submitVehicleCheck(checkList);
       onSuccess();
       setError('');
     } catch (err: any) {
@@ -55,8 +49,6 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
       );
     }
   };
-
-
 
   useEffect(() => {
     if (Object.values(checkList).every((item) => item)) {
@@ -75,7 +67,9 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
         borderRadius: 3,
       }}
     >
-      <Typography variant="h6">✔️ Pre-trip Vehicle Checklist</Typography>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Typography variant="h6">✔️ Pre-trip Vehicle Checklist</Typography>
+      </Box>
       <Divider sx={{ mb: 2 }} />
 
       <Box display="flex" flexDirection="column">

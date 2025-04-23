@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Passenger, Ride } from '../shared/types';
+import { useLocation } from 'react-router-dom';
+import { RideT } from '../shared/types';
 import {
   Alert,
   Box,
@@ -10,90 +10,39 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { postCheckInPassengers, postStartRide } from '../services/api';
 import checkIcon from '../assets/checkIcon.png';
 import rejectIson from '../assets/rejectIcon.png';
+import { usePassengerCheck } from '../hooks/usePassengerCheck';
+import { useStartRide } from '../hooks/useStartRide';
+import {
+  statusColorLeftBorder,
+  statusLabelMap,
+  statusColorMap,
+} from '../shared/colorStatus';
 
-const statusColorMap: Record<
-  Passenger['status'],
-  'success' | 'error' | 'default'
-> = {
-  'checked-in': 'success',
-  rejected: 'error',
-  pending: 'default',
-};
-
-const statusLabelMap: Record<
-  Passenger['status'],
-  'Checked-in' | 'Rejected' | 'Waiting'
-> = {
-  'checked-in': 'Checked-in',
-  rejected: 'Rejected',
-  pending: 'Waiting',
-};
-
-const statusColorLeftBorder: Record<
-  Passenger['status'],
-  '#2ecc71' | '#e74c3c' | '#bdc3c7'
-> = {
-  'checked-in': '#2ecc71',
-  rejected: '#e74c3c',
-  pending: '#bdc3c7',
-};
-
-function RideInfo() {
+function Ride() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const data = location.state as Ride;
+  const [localError, setLocalError] = useState<string>('');
 
-  const [rideInfo, setRideInfo] = useState<Ride>(data);
-  const [error, setError] = useState<string>('');
+  const data = location.state as RideT;
+  const { rideInfo, handlePassengerCheck } = usePassengerCheck(
+    data,
+    setLocalError
+  );
+  const { handleStartRide, error, setError } = useStartRide();
 
   const countOfPassengers = rideInfo.passengers.filter(
     (pas) => pas.status !== 'pending'
   ).length;
 
-  const handlePassengerCheck = async (passId: string, status: string) => {
-    console.log(passId);
-    try {
-      await postCheckInPassengers(rideInfo.shiftId, passId, status);
-
-      // add a new status of passengers
-      setRideInfo((prev) => ({
-        ...prev,
-        passengers: prev.passengers.map((pas) =>
-          pas.id === passId
-            ? {
-                ...pas,
-                status: status === 'checked-in' ? 'checked-in' : 'rejected',
-              }
-            : pas
-        ),
-      }));
-    } catch (err: any) {
-      setError(err.response.data.message);
-    }
-  };
-
-  const handleStart = async () => {
-    try {
-      const res = await postStartRide();
-      if (res.status === 200) {
-        setError('');
-        navigate('/start-ride');
-      }
-    } catch (err: any) {
-      setError(err.response.data.message || 'Something went wrong...');
-    }
-  };
-
   useEffect(() => {
     const allHandled = rideInfo.passengers.every((p) => p.status !== 'pending');
-
+    
     if (allHandled) {
+      setLocalError('');
       setError('');
     }
-  }, [rideInfo.passengers, error]);
+  }, [rideInfo.passengers]);
 
   return (
     <Box
@@ -172,7 +121,7 @@ function RideInfo() {
               color="success"
               onClick={() => handlePassengerCheck(pas.id, 'checked-in')}
             >
-              <img src={checkIcon} />
+              <img alt='check-in' src={checkIcon} />
             </Button>
             <Button
               size="small"
@@ -180,15 +129,15 @@ function RideInfo() {
               color="error"
               onClick={() => handlePassengerCheck(pas.id, 'reject')}
             >
-              <img src={rejectIson} />
+              <img alt='reject' src={rejectIson} />
             </Button>
           </Box>
         </Paper>
       ))}
 
-      {error && (
+      {(localError || error) && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
+          {localError || error}
         </Alert>
       )}
 
@@ -201,7 +150,7 @@ function RideInfo() {
           variant="contained"
           color="success"
           size="large"
-          onClick={handleStart}
+          onClick={handleStartRide}
         >
           Start Ride
         </Button>
@@ -210,4 +159,4 @@ function RideInfo() {
   );
 }
 
-export default RideInfo;
+export default Ride;
