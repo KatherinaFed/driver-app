@@ -11,28 +11,25 @@ import {
   Typography,
 } from '@mui/material';
 import VehicleCheck from '../components/VehicleCheck';
-import { RideT } from '../shared/types';
 import { useDriver } from '../hooks/useDriver';
 import useRidePolling from '../hooks/usePolling';
+import { Ride } from '../api/generated';
 
 function Driver() {
   const { driverId } = useParams<{ driverId: string }>();
   const navigate = useNavigate();
-  const [rideInfo, setRideInfo] = useState<RideT | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
+  const [rideInfo, setRideInfo] = useState<Ride | null>(null);
 
   // fetchind driver
   const { driverInfo, error, loading, fetchDriverInfo, setError } = useDriver(driverId);
 
   const shouldStartPolling = !!driverInfo?.vehicleCheckDone && !rideInfo;
-  const handlePollingSuccess = (ride: RideT) => {
+  const handlePollingSuccess = (ride: Ride) => {
     setRideInfo(ride);
-    setIsPolling(false);
     navigate('/ride', { state: ride });
   };
   const handlePollingError = (msg: string) => {
     setError(msg);
-    setIsPolling(false);
   };
 
   // polling ride
@@ -42,11 +39,11 @@ function Driver() {
     onError: handlePollingError,
   });
 
-  useEffect(() => {
-    if (shouldStartPolling) {
-      setIsPolling(true);
-    }
-  }, [driverInfo?.vehicleCheckDone, rideInfo]);
+  // useEffect(() => {
+  //   if (shouldStartPolling) {
+  //     setIsPolling(true);
+  //   }
+  // }, [driverInfo?.vehicleCheckDone, rideInfo]);
 
   return (
     <Box
@@ -109,7 +106,7 @@ function Driver() {
           </Fade>
         )}
 
-        {isPolling && !loading && (
+        {shouldStartPolling && !loading && (
           <Fade in={true} timeout={500}>
             <Box
               sx={{
@@ -124,7 +121,7 @@ function Driver() {
           </Fade>
         )}
 
-        {error && (
+        {error && !shouldStartPolling && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>

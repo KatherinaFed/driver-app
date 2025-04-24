@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { VehicleCheckList } from '../shared/types';
-import { DriverService } from '../services/DriverService';
+import { DefaultService } from '../api/generated';
 
 interface VehicleProps {
   onSuccess: () => void;
@@ -40,7 +40,7 @@ function VehicleCheck({ onSuccess }: VehicleProps) {
   // POST vehicle checklist
   const handleSubmit = async () => {
     try {
-      await DriverService.submitVehicleCheck(checkList);
+      await DefaultService.postVehicleCheck(checkList);
       onSuccess();
       setError('');
     } catch (err: any) {

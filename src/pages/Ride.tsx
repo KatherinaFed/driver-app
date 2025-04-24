@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { RideT } from '../shared/types';
 import {
   Alert,
   Box,
@@ -19,25 +18,28 @@ import {
   statusLabelMap,
   statusColorMap,
 } from '../shared/colorStatus';
+import { Passenger, Ride } from '../api/generated';
 
-function Ride() {
+function RidePage() {
   const location = useLocation();
   const [localError, setLocalError] = useState<string>('');
 
-  const data = location.state as RideT;
+  const data = location.state as Ride;
   const { rideInfo, handlePassengerCheck } = usePassengerCheck(
     data,
     setLocalError
   );
   const { handleStartRide, error, setError } = useStartRide();
 
-  const countOfPassengers = rideInfo.passengers.filter(
+  const countOfPassengers = rideInfo.passengers?.filter(
     (pas) => pas.status !== 'pending'
   ).length;
 
   useEffect(() => {
-    const allHandled = rideInfo.passengers.every((p) => p.status !== 'pending');
-    
+    const allHandled = rideInfo.passengers?.every(
+      (p) => p.status !== 'pending'
+    );
+
     if (allHandled) {
       setLocalError('');
       setError('');
@@ -70,23 +72,23 @@ function Ride() {
           <Box component="span" fontWeight="bold">
             📍 From:
           </Box>{' '}
-          {rideInfo.pickupLocation.address}
+          {rideInfo.pickupLocation?.address}
         </Typography>
         <Typography variant="body1">
           <Box component="span" fontWeight="bold">
             🏁 To:
           </Box>{' '}
-          {rideInfo.dropoffLocation.address}
+          {rideInfo.dropoffLocation?.address}
         </Typography>
       </Paper>
 
       <Divider variant="middle" />
 
       <Typography variant="h5" align="center" m={2}>
-        Passengers ({countOfPassengers}/{rideInfo.passengers.length})
+        Passengers ({countOfPassengers}/{rideInfo.passengers?.length})
       </Typography>
 
-      {rideInfo.passengers.map((pas, key) => (
+      {rideInfo.passengers?.map((pas, key) => (
         <Paper
           key={key}
           elevation={2}
@@ -99,7 +101,9 @@ function Ride() {
             mb: 2,
             p: { xs: 2, md: 3 },
             borderRadius: 3,
-            borderLeft: `6px solid ${statusColorLeftBorder[pas.status]}`,
+            borderLeft: `6px solid ${
+              statusColorLeftBorder[pas.status ?? 'pending']
+            }`,
 
             bgcolor: '#fdfdf3',
           }}
@@ -107,8 +111,8 @@ function Ride() {
           <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
             <Typography fontWeight={500}>👤 {pas.name}</Typography>
             <Chip
-              label={statusLabelMap[pas.status]}
-              color={statusColorMap[pas.status]}
+              label={statusLabelMap[pas.status ?? 'pending']}
+              color={statusColorMap[pas.status ?? 'pending']}
               size="small"
               variant="outlined"
             />
@@ -119,17 +123,25 @@ function Ride() {
               size="small"
               variant="outlined"
               color="success"
-              onClick={() => handlePassengerCheck(pas.id, 'checked-in')}
+              onClick={() => {
+                if (pas.id) {
+                  handlePassengerCheck(pas.id, Passenger.status.CHECKED_IN);
+                }
+              }}
             >
-              <img alt='check-in' src={checkIcon} />
+              <img alt="check-in" src={checkIcon} />
             </Button>
             <Button
               size="small"
               variant="outlined"
               color="error"
-              onClick={() => handlePassengerCheck(pas.id, 'reject')}
+              onClick={() => {
+                if (pas.id) {
+                  handlePassengerCheck(pas.id, Passenger.status.REJECTED);
+                }
+              }}
             >
-              <img alt='reject' src={rejectIson} />
+              <img alt="reject" src={rejectIson} />
             </Button>
           </Box>
         </Paper>
@@ -159,4 +171,4 @@ function Ride() {
   );
 }
 
-export default Ride;
+export default RidePage;

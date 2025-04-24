@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { DriverInfo } from '../shared/types';
-import { DriverService } from '../services/DriverService';
+import { DefaultService, DriverShift } from '../api/generated';
 
 export function useDriver(driverId?: string) {
-  const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
+  const [driverInfo, setDriverInfo] = useState<DriverShift | null>(null);
   driverInfo;
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,8 +13,8 @@ export function useDriver(driverId?: string) {
     setLoading(true);
 
     try {
-      const data = await DriverService.getDriverShift(driverId);
-      const selectedData: DriverInfo = {
+      const data = await DefaultService.getDriverShift(driverId);
+      const selectedData: DriverShift = {
         driverId: data.driverId,
         licensePlate: data.licensePlate,
         vehicleId: data.vehicleId,

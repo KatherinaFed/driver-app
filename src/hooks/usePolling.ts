@@ -1,18 +1,13 @@
 import { useEffect } from 'react';
-import { RideT } from '../shared/types';
-import { DriverService } from '../services/DriverService';
+import { DefaultService, Ride } from '../api/generated';
 
 interface RidePollingProps {
   started: boolean;
-  onSuccess: (ride: RideT) => void;
+  onSuccess: (ride: Ride) => void;
   onError: (msg: string) => void;
 }
 
-function useRidePolling({
-  started,
-  onSuccess,
-  onError
-}: RidePollingProps) {
+function useRidePolling({ started, onSuccess, onError }: RidePollingProps) {
   useEffect(() => {
     if (!started) return;
 
@@ -21,19 +16,9 @@ function useRidePolling({
 
     const pollingRide = async () => {
       try {
-        const res = await DriverService.getAssignedRide();
-        const { data } = res;
-        const selectedRideData: RideT = {
-          dropoffLocation: data.dropoffLocation,
-          passengers: data.passengers,
-          pickupLocation: data.pickupLocation,
-          rideId: data.rideId,
-          rideStarted: data.rideStarted,
-          shiftId: data.shiftId,
-        };
-        if (res.status === 200) {
-          onSuccess(selectedRideData);
-        }
+        const data = await DefaultService.getRideRequest();
+
+        onSuccess(data);
       } catch (error: any) {
         if (error.response?.status !== 404) {
           onError('Failed to check ride assignment');

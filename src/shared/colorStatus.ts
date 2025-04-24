@@ -1,7 +1,7 @@
-import { Passenger } from "./types";
+import { Passenger } from "../api/generated/models/Passenger";
 
 export const statusColorMap: Record<
-  Passenger['status'],
+  Passenger.status,
   'success' | 'error' | 'default'
 > = {
   'checked-in': 'success',
@@ -10,7 +10,7 @@ export const statusColorMap: Record<
 };
 
 export const statusLabelMap: Record<
-  Passenger['status'],
+  Passenger.status,
   'Checked-in' | 'Rejected' | 'Waiting'
 > = {
   'checked-in': 'Checked-in',
@@ -19,7 +19,7 @@ export const statusLabelMap: Record<
 };
 
 export const statusColorLeftBorder: Record<
-  Passenger['status'],
+  Passenger.status,
   '#2ecc71' | '#e74c3c' | '#bdc3c7'
 > = {
   'checked-in': '#2ecc71',

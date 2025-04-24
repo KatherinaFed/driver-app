@@ -1,31 +1,38 @@
-import {  useState } from 'react';
-import { RideT } from '../shared/types';
-import { DriverService } from '../services/DriverService';
+import { useState } from 'react';
+import { DefaultService, Passenger, Ride } from '../api/generated';
 
 export function usePassengerCheck(
-  initRideData: RideT,
+  initRideData: Ride,
   onError: (msg: string) => void
 ) {
-  const [rideInfo, setRideInfo] = useState<RideT>(initRideData);
+  const [rideInfo, setRideInfo] = useState<Ride>(initRideData);
 
-  const handlePassengerCheck = async (passId: string, status: string) => {
+  const handlePassengerCheck = async (
+    passId: string,
+    status: Passenger.status
+  ) => {
     try {
-      await DriverService.checkInPassenger(rideInfo.shiftId, passId, status);
+      const action = status === 'checked-in' ? 'check-in' : 'reject';
+      await DefaultService.postCheckInPassenger({
+        passengerId: passId,
+        action,
+      });
 
-      // add a new status of passengers
       setRideInfo((prev) => ({
         ...prev,
-        passengers: prev.passengers.map((pas) =>
+        passengers: (prev.passengers || []).map((pas) =>
           pas.id === passId
             ? {
                 ...pas,
-                status: status === 'checked-in' ? 'checked-in' : 'rejected',
+                status,
               }
             : pas
         ),
       }));
     } catch (err: any) {
-      onError(err.response.data.message);
+      onError(
+        err.response?.data?.message || 'Failed to update passenger status'
+      );
     }
   };
 
