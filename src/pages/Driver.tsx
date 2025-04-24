@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Alert,
@@ -38,12 +38,6 @@ function Driver() {
     onSuccess: handlePollingSuccess,
     onError: handlePollingError,
   });
-
-  // useEffect(() => {
-  //   if (shouldStartPolling) {
-  //     setIsPolling(true);
-  //   }
-  // }, [driverInfo?.vehicleCheckDone, rideInfo]);
 
   return (
     <Box
