@@ -1,9 +1,13 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useDriver } from '../../hooks/useDriver';
-import { DriverService } from '../../services/DriverService';
+import { DefaultService } from '../../api/generated';
 
-vi.mock('../../services/DriverService');
+vi.mock('../../api/generated', () => ({
+  DefaultService: {
+    getDriverShift: vi.fn(),
+  },
+}));
 
 const mockDriverData = {
   driverId: '123',
@@ -19,7 +23,7 @@ describe('useDriver', () => {
   });
 
   it('should fetch and return driver info', async () => {
-    vi.mocked(DriverService.getDriverShift).mockResolvedValue(mockDriverData);
+    vi.mocked(DefaultService.getDriverShift).mockResolvedValue(mockDriverData);
 
     const { result } = renderHook(() => useDriver('123'));
     
@@ -30,11 +34,11 @@ describe('useDriver', () => {
       expect(result.current.error).toBe('');
     });
 
-    expect(DriverService.getDriverShift).toHaveBeenCalledWith('123');
+    expect(DefaultService.getDriverShift).toHaveBeenCalledWith('123');
   });
 
   it('should handle error while fetching driver info', async () => {
-    vi.mocked(DriverService.getDriverShift).mockRejectedValue({
+    vi.mocked(DefaultService.getDriverShift).mockRejectedValue({
       response: { data: { message: 'Driver not found' } },
     });
 
